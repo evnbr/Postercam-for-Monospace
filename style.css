@@ -16,6 +16,9 @@ body {
 canvas {
   display: block; }
 
+.justface {
+  display: inline-block; }
+
 .step {
   display: inline-block;
   vertical-align: top; }
@@ -23,6 +26,9 @@ canvas {
 #wrapper {
   margin: 10px auto;
   position: relative; }
+
+video, #facetemp {
+  visibility: hidden; }
 
 svg {
   position: absolute;

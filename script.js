@@ -4,7 +4,8 @@ var app_options = {
     face_step_fwd: 2,
     face_step_bwd: 0.2,
     now_playing: false, 
-    draw_triangles: false
+    draw_triangles: false,
+    contrast_boost: 100
 };
 
 
@@ -53,10 +54,11 @@ var app_options = {
 var video = document.getElementById('webcam');
 var canvas = document.getElementById('canvas');
 var triangle_canvas = document.getElementById('facets');
-var face_canvas = document.querySelector('.justface');
+var face_canvas = document.getElementById('facetemp');
 var dither_canvas = document.getElementById('dither');
 var log = document.getElementById('log');
 
+var face_canvas_list = document.querySelectorAll('.justface');
 
 
 function get_webcam() {
@@ -179,7 +181,8 @@ function tick() {
         // DITHERIZE
         // ---------
         // ditherize(canvas);
-        ditherize(face_canvas);
+        // ditherize(face_canvas);
+        ditherize(face_canvas_list[0]);
         // ditherize(triangle_canvas);
 
         // DETECT FACES
@@ -413,30 +416,47 @@ function draw_faces(ctx, rects, sc, max, cwid) {
     var n = max || on;
     n = Math.min(n, on);
     var r;
-    console.log(n);
+    // console.log(n);
 
     face_ctx.clearRect(0,0,face_canvas.width, face_canvas.height);
-
 
     for(var i = 0; i < n; ++i) {
         r = rects[i];
         ctx.strokeRect(
-            (cwid - r.x*sc - r.width*sc)|0,
+            (r.x*sc)|0,
             (r.y*sc)|0,
             (r.width*sc)|0,
             (r.height*sc)|0
         );
 
-        var faceData = canvas.getContext('2d').getImageData(r.x,r.y,r.width,r.height);   
-        face_ctx.putImageData(faceData, i * 120, 0);
-        // return range_to_one(r.width, [22,60]);
+        var inset = - r.width / 6;
+
+        var faceData = canvas.getContext('2d').getImageData(r.x + inset, r.y + inset, r.width - inset*2, r.height - inset*2);
+
+        face_ctx.putImageData(contrastImage(faceData, app_options.contrast_boost), 0, 0);
+
+        face_canvas_list[i].getContext('2d').drawImage(face_canvas,0,0, (300/(r.width - inset*2)) * 300, (300/(r.height - inset*2)) * 300);
     }
+
+    return range_to_one(rects[0].width, [22,60]);
 
     // update_d3_face([]);
 
 }
 
+function contrastImage(imageData, contrast) {
 
+    var data = imageData.data;
+    var factor = (259 * (contrast + 255)) / (255 * (259 - contrast));
+
+    for(var i=0;i<data.length;i+=4)
+    {
+        data[i] = (factor * ((data[i] - 128) + 128));
+        data[i+1] = (factor * ((data[i+1] - 128) + 128));
+        data[i+2] = (factor * ((data[i+2] - 128) + 128));
+    }
+    return imageData;
+}
 
 
 
