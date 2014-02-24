@@ -1,0 +1,178 @@
+*
+    padding: 0
+    margin: 0
+    font: inherit
+
+input[type=checkbox]
+    margin-right: 10px
+
+html
+    font: 15px/1.5 sans-serif
+
+body
+    position: relative
+    margin-top: 3em
+
+canvas
+    display: block
+
+.step
+    display: inline-block
+    vertical-align: top
+
+#wrapper 
+    margin: 10px auto
+    position: relative
+
+#facets 
+    //position: absolute
+    //top: 0px
+    //left: 0px
+    // visibility: hidden
+
+video 
+    // visibility: hidden
+
+svg 
+    position: absolute
+    top: 0px
+    left: 0px
+    -webkit-transform: scale(1.5)
+    -webkit-transform-origin: top left
+
+#controls
+    padding: 0.5em
+    background: #eee
+    position: fixed
+    top: 0
+    left: 0
+    right: 0
+    z-index: 999
+    -webkit-user-select: none
+
+
+.col
+    display: inline-block
+    border-right: 1px dotted gray
+    padding-right: 10px
+    margin-right: 10px
+    vertical-align: top
+    &:last-child
+        border-right: 0
+
+label
+    display: block
+    line-height: 20px
+
+progress[value], input[type="range"]
+    -webkit-appearance: none !important
+    margin-right: 20px
+    height: 10px
+    width: 300px
+    background: #ddd
+    &:focus
+        outline: none
+
+@-webkit-keyframes countdown
+    0%
+        background: gray
+        width: 300px
+    100%
+        background: gray
+        width: 0px
+
+
+progress[value]
+    height: 10px
+    &::-webkit-progress-bar
+        background: #ddd
+    &::-webkit-progress-value
+        background: blue
+    &.paused::-webkit-progress-bar
+        -webkit-animation: countdown 40s 1
+
+#facesizeprogress
+    &::-webkit-progress-value
+        background: #999
+
+
+input[type="range"]
+    &::-webkit-slider-thumb
+        -webkit-appearance: none
+        height: 20px
+        width: 20px
+        background: white
+        border-radius: 50%
+        box-shadow: 0 1px 2px rgba(0,0,0,0.2)
+
+.labeltext
+    display: none
+    font-size: 18px
+    font-family: "Apercu Mono", monospace
+    position: absolute
+
+#title
+    color: purple
+
+#datetime
+    color: magenta
+
+#playpause
+    padding: 5px 50px
+
+// Print Styles
+// ------------
+
+@media print 
+    body
+        margin: 0
+        height: 10in
+        border: 1px solid transparent
+
+    #wrapper
+        height: 10in
+        border: 1px solid transparent
+
+    .labeltext
+        display: block
+
+    #quote
+        margin: 1.5in 1in 0.8in 0.8in
+        width: auto
+        font-size: 70px
+        text-indent: -35px
+        color: #582e91
+    
+    #controls
+        display: none
+    
+    svg
+        top: 1.8in
+        -webkit-transform: scale(1.5)
+
+    #facets
+        visibility: visible
+        top: auto
+        left: auto
+        bottom: 3in
+        right: 1in
+        z-index: -1
+        -webkit-transform: scale(1.4)
+
+
+// SVG Styles
+// ----------
+
+path 
+    fill: yellow
+    stroke: #000
+
+line 
+    pointer-events: none
+    stroke: magenta
+    stroke-width: 0.2px
+
+rect
+    fill: rgba(255,0,255,0.00)
+    stroke: purple
+    stroke-width: 0px
