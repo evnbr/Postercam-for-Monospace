@@ -415,26 +415,6 @@ function contrastImage(imageData, contrast) {
 
 // D I T H E R
 
-// var dither_worker = new Worker("dither.js");
-// var dither_worker_busy = false;
-
-// dither_worker.addEventListener('message', function (e) {
-//     dither_canvas.getContext('2d').putImageData(e.data, 0, 0);
-//     dither_worker_busy = false;
-// }, false);
-
-// function ditherize(input_canvas) {
-//   if (input_canvas && dither_worker && !dither_worker_busy) {
-//     var imageData = input_canvas.getContext('2d').getImageData(0,0, input_canvas.width, input_canvas.height);        
-//     dither_worker.postMessage({
-//       imageData: imageData,
-//       threshold: 0.2,
-//       type: "atkinson"
-//     });
-//     // Don't process a new frame until this one is done
-//     dither_worker_busy = true;
-//   }
-// }
 
 function DitheredFace(input, output) {
     var self = this
