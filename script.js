@@ -5,7 +5,7 @@ var app_options = {
     face_step_bwd: 0.2,
     now_playing: false, 
     draw_triangles: false,
-    contrast_boost: 100
+    contrast_boost: 60
 };
 
 
@@ -52,10 +52,17 @@ var app_options = {
 
 
 var video = document.getElementById('webcam');
+
 var canvas = document.getElementById('canvas');
+
 var triangle_canvas = document.getElementById('facets');
+
 var face_canvas = document.getElementById('facetemp');
+
+var fullres_canvas = document.getElementById('fullres');
+
 var dither_canvas = document.getElementById('dither');
+
 var log = document.getElementById('log');
 
 var face_canvas_list = document.querySelectorAll('.justface');
@@ -94,7 +101,7 @@ var img_u8, face_img_u8, corners, threshold;
 
 var demo_opt = function(){
     this.threshold = 10;
-    this.resolution = 1;
+    this.resolution = 0.4;
     this.draw_borders = false;
 }
 
@@ -281,7 +288,7 @@ function tick() {
                 //triangle_ctx.fillRect(triangles[i].a.x,triangles[i].a.y, 1, 1);
             }
 
-            triangle_ctx.strokeStyle = 'black';
+            triangle_ctx.strokeStyle = 'red';
 
             triangle_ctx.scale(1, 1);
 
@@ -305,43 +312,6 @@ function tick() {
 var sc = 4;
 var width = 1200,
     height = 800;
-//var svg = d3.select("#wrapper").append("svg")
-var svg = d3.selectAll([document.getElementById("#wrapper"), document.body]).append("svg")
-    .attr("id", "meshsvg")
-    .attr("width", width)
-    .attr("height", height);
-var d3_geom_voronoi = d3.geom.voronoi().x(function(d) { return d.x; }).y(function(d) { return d.y; })
-var link = svg.selectAll("line");
-var facerect = svg.selectAll("rect");
-
-function update_d3(nodes) {
-
-    link = link.data(d3_geom_voronoi.links(nodes));
-    link.enter().append("line")
-    link
-        .attr("x1", function(d) { return 750 - (d.source.x * sc); })
-        .attr("y1", function(d) { return 50 + (d.source.y * sc); })
-        .attr("x2", function(d) { return 750 - (d.target.x * sc); })
-        .attr("y2", function(d) { return 50 + (d.target.y * sc); });
-    link.exit().remove();
-}
-
-function update_d3_face(facearray) {
-
-    facerect = facerect.data(facearray);
-    facerect.enter().append("rect")
-    facerect.transition()
-        .attr("x", function(d) { return d.x * sc; })
-        .attr("y", function(d) { return d.y * sc; })
-        .attr("width", function(d) { return d.w * sc; })
-        .attr("height", function(d) { return d.h * sc; })
-        .attr("rx", function(d) { return d.w/2 * sc; })
-        .attr("ry", function(d) { return d.h/2 * sc; });
-    facerect.exit().remove();
-
-    // console.log(facerect);
-}
-
 
 
 
@@ -438,7 +408,7 @@ function draw_faces(ctx, rects, sc, max, cwid) {
         face_canvas_list[i].getContext('2d').drawImage(face_canvas,0,0, (300/(r.width - inset*2)) * 300, (300/(r.height - inset*2)) * 300);
     }
 
-    return range_to_one(rects[0].width, [22,60]);
+    if (rects.length) return range_to_one(rects[0].width, [22,60]);
 
     // update_d3_face([]);
 

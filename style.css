@@ -27,9 +27,6 @@ canvas {
   margin: 10px auto;
   position: relative; }
 
-video, #facetemp {
-  visibility: hidden; }
-
 svg {
   position: absolute;
   top: 0px;
@@ -114,40 +111,8 @@ input[type="range"]::-webkit-slider-thumb {
   padding: 5px 50px; }
 
 @media print {
-  body {
-    margin: 0;
-    height: 10in;
-    border: 1px solid transparent; }
-
-  #wrapper {
-    height: 10in;
-    border: 1px solid transparent; }
-
-  .labeltext {
-    display: block; }
-
-  #quote {
-    margin: 1.5in 1in 0.8in 0.8in;
-    width: auto;
-    font-size: 70px;
-    text-indent: -35px;
-    color: #582e91; }
-
   #controls {
-    display: none; }
-
-  svg {
-    top: 1.8in;
-    -webkit-transform: scale(1.5); }
-
-  #facets {
-    visibility: visible;
-    top: auto;
-    left: auto;
-    bottom: 3in;
-    right: 1in;
-    z-index: -1;
-    -webkit-transform: scale(1.4); } }
+    display: none; } }
 path {
   fill: yellow;
   stroke: black; }
