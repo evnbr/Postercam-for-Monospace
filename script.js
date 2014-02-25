@@ -1,7 +1,7 @@
 var app_options = {
     has_webcam: false,
     printing_enabled: false,
-    face_confidence_step: 3,
+    face_confidence_step: 2,
     face_confidence_decay: 0.3,
     now_playing: false, 
     contrast_boost: 100,
@@ -429,7 +429,7 @@ function DitheredFace(input, output) {
       ;
 
     self.init = function() {
-        out_canvas.style.display = "none";
+        out_canvas.classList.remove("visible");
     }
 
     self.update = function() {
@@ -449,14 +449,14 @@ function DitheredFace(input, output) {
             last_drawn++;
         }
         else {
-            out_canvas.style.display = "none";
+            out_canvas.classList.remove("visible");
         }
     }
 
     worker.addEventListener('message', function (e) {
         out_ctx.putImageData(e.data, 0, 0);
         worker_busy = false;
-        out_canvas.style.display = "block";
+        out_canvas.classList.add("visible");
         last_drawn = 0;
     }, false);
 

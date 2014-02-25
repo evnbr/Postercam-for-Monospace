@@ -108,18 +108,22 @@ input[type="range"]::-webkit-slider-thumb {
 
 h1 {
   font: 500 25px/1.1 brown;
-  margin-top: 1em;
+  margin-top: 1.5em;
   margin-bottom: 0.3em;
   padding: 0 15px; }
 
 .labeltext {
-  font: 10px/1.2 Akkurat-Mono;
+  font: 12px/1.5 Akkurat-Mono;
   padding: 0 15px 2em;
   border-bottom: 1px dotted #f4f4f4; }
 
 .logo {
-  margin: 0 15px; }
+  margin: 0 15px;
+  height: 0;
+  position: relative; }
   .logo img {
+    position: relative;
+    top: -20px;
     width: 100%; }
 
 #printable {
@@ -133,8 +137,12 @@ h1 {
 .logo {
   display: none; }
 
-.dither.visible + .logo {
-  display: block; }
+.dither {
+  display: none; }
+  .dither.visible {
+    display: block; }
+    .dither.visible + .logo {
+      display: block; }
 
 @media print {
   body {
