@@ -94,8 +94,6 @@ function get_webcam() {
 
 
 
-var stat = new profiler();
-
 var gui, options, ctx, triangle_ctx, face_ctx;
 var img_u8, face_img_u8, corners, threshold;
 
@@ -129,12 +127,6 @@ function start_app() {
         }
     }
 
-
-    stat.add("capture");
-    stat.add("grayscale");
-    stat.add("fast corners");
-    stat.add("triangles");
-    stat.add("rendering");
     
     ctx = canvas.getContext('2d');
     triangle_ctx = triangle_canvas.getContext('2d');
@@ -150,7 +142,6 @@ function tick() {
     
     if (app_options.now_playing) compatibility.requestAnimationFrame(tick);
 
-    stat.new_frame();
     if (video.readyState === video.HAVE_ENOUGH_DATA) {
         var cwidth = Math.floor(640*options.resolution);
         var cheight = Math.floor(480*options.resolution);
@@ -161,19 +152,14 @@ function tick() {
         // DRAW FRAME
         // ----------
 
-        stat.start("capture");
         ctx.drawImage(video, 0, 0, cwidth, cheight);
         var imageData = ctx.getImageData(0, 0, cwidth, cheight);
-        stat.stop("capture");
-
 
 
         // CONVERT TO GRAYSCALE
         // --------------------
-        stat.start("grayscale");
         jsfeat.imgproc.grayscale(imageData.data, img_u8.data);
         //jsfeat.imgproc.box_blur_gray(img_u8.data, img_u8.data, 10, 0);
-        stat.stop("grayscale");
         // ---------------------
         var data_u32 = new Uint32Array(imageData.data.buffer);
         var alpha = (0xff << 24);
@@ -207,96 +193,11 @@ function tick() {
             threshold = options.threshold|0;
             jsfeat.fast_corners.set_threshold(threshold);
         }
-        stat.start("fast corners");
         var count = jsfeat.fast_corners.detect(img_u8, corners, 5);
-        stat.stop("fast corners");
+
 
         var face_w = draw_faces(ctx, rects, cwidth/img_u8.cols, 4, canvas.width); // count up to 4 faces
         face_detected_update(face_w);
-
-
-        if (app_options.draw_triangles) {
-
-            // TRIANGULATE
-            // --------
-
-            stat.start("triangles");
-            var vertices = [];//{x:0,y:0},{x:cwidth,y:0},{x:cwidth,y:cheight},{x:0,y:cheight}];
-            for(var i=0;i<count;i++) {
-                vertices.push(corners[i]);
-            }
-            var triangles = triangulate(vertices);
-
-            // update_d3(vertices);
-
-            stat.stop("triangles");
-
-
-
-            function getTriangleColor(img,triangle) {
-                var getColor = function (point) {
-                    var offset = (point.x+point.y*cwidth)*4;
-                    return img.data[offset];
-                }
-                var midPoint = function (point1,point2) {
-                    return {x:(point1.x+point2.x)/2,
-                            y:(point1.y+point2.y)/2};
-                }
-                // Pick a point inside the triangle
-                var point1 = midPoint(triangle.a,triangle.b);
-                var point = midPoint(point1,triangle.c);
-                return getColor({x:Math.floor(point.x),y:Math.floor(point.y)});
-            }
-
-
-            // RENDER
-            // ------
-
-            stat.start("rendering");
-
-            // var face_w = draw_faces(triangle_ctx, rects, cwidth/img_u8.cols, 4, canvas.width); // count up to 4 faces
-            // face_detected_update(face_w);
-
-            triangle_ctx.scale(-1, 1);
-            triangle_ctx.fillStyle = 'rgb(255,255,255)';
-            triangle_ctx.fillRect ( 0 , 0 , canvas.width , canvas.height);
-
-            for(var i=0;i<triangles.length;i++) {
-                var color = triangles[i].color = getTriangleColor(imageData,triangles[i]);
-
-                // if (color < 110) color = 0;
-                // else color = 255;
-
-                triangle_ctx.fillStyle = 'rgb('+
-                    color +','+
-                    color +','+
-                    color +')';
-
-                triangle_ctx.beginPath();
-                    triangle_ctx.moveTo(canvas.width - triangles[i].a.x,triangles[i].a.y);
-                    triangle_ctx.lineTo(canvas.width - triangles[i].b.x,triangles[i].b.y);
-                    triangle_ctx.lineTo(canvas.width - triangles[i].c.x,triangles[i].c.y);
-                triangle_ctx.closePath();
-
-                // triangle_ctx.setLineDash([1,5]);
-                // triangle_ctx.lineWidth = 0.1;
-                // triangle_ctx.strokeStyle = 'purple';
-                // triangle_ctx.stroke();
-
-                triangle_ctx.fill();
-                //triangle_ctx.fillStyle = 'rgb(255,255,255)';
-                //triangle_ctx.fillRect(triangles[i].a.x,triangles[i].a.y, 1, 1);
-            }
-
-            triangle_ctx.strokeStyle = 'red';
-
-            triangle_ctx.scale(1, 1);
-
-            stat.stop("rendering");
-
-        }
-
-        // log.innerHTML = stat.log();
     }
 }
 
@@ -440,15 +341,7 @@ dither_worker.addEventListener('message', function (e) {
 
 function ditherize(input_canvas) {
   if (input_canvas && dither_worker && !dither_worker_busy) {
-    // if (this.canvas.height !== this._image.height) {
-    //   this.canvas.height = this._image.height;
-    // }
-    // if (this.canvas.width !== this._image.width) {
-    //   this.canvas.width = this._image.width;
-    // }
     var imageData = input_canvas.getContext('2d').getImageData(0,0, input_canvas.width, input_canvas.height);        
-    // var data = dither(imageData, this._threshold, this._type);
-    // this.context.putImageData(data, 0, 0);
     dither_worker.postMessage({
       imageData: imageData,
       threshold: 0.2,
