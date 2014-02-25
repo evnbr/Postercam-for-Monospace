@@ -37,9 +37,38 @@
             </div>
         </div>
 
+        <div id="printable">
+            <h1 class="title">
+                thanks for stopping by
+            </h1>
 
-        <div class="labeltext" id="title">Fast, Cheap, and Out of Control</div>
-        <div class="labeltext" id="datetime">Anyone have the time?</div>
+            <canvas class="dither" width="300" height="300"></canvas>
+            <div class="logo"><img src="logo.svg" /></div>
+
+            <canvas class="dither" width="300" height="300"></canvas>
+            <div class="logo"><img src="logo.svg" /></div>
+
+            <canvas class="dither" width="300" height="300"></canvas>
+            <div class="logo"><img src="logo.svg" /></div>
+
+            <canvas class="dither" width="300" height="300"></canvas>
+            <div class="logo"><img src="logo.svg" /></div>
+
+            <canvas class="dither" width="300" height="300"></canvas>
+            <div class="logo"><img src="logo.svg" /></div>
+
+            <canvas class="dither" width="300" height="300"></canvas>
+            <div class="logo"><img src="logo.svg" /></div>
+
+            <h1 class="title">
+                a senior show from your friends in graphic design
+            </h1>
+
+            <div class="labeltext" id="datetime">
+                Anyone have the time?
+            </div>
+
+        </div>
 
         <div id="wrapper">
 
@@ -50,23 +79,18 @@
 
             <section class="step">
                 <h3>Full-res to sample from</h3>
-                <canvas id="fullres"></canvas>
+                <canvas id="fullres" width="640" height="480"></canvas>
             </section>
 
             <section class="step">
                 <h3>Downscaled for processing</h3>
                 <canvas id="canvas"></canvas>
             </section>
+
             <section class="step">
                 <h3>Just the face (scratch)</h3>
                 <canvas id="facetemp" width="300" height="300"></canvas>
             </section>
-
-            <section class="step">
-                <h3>Dithered</h3>
-                <canvas id="dither" width="640" height="480"></canvas>
-            </section>
-
 
             <section class="step">
                 <h3>Just the face</h3>
@@ -83,9 +107,13 @@
                 <canvas id="facets" width="640" height="480"></canvas>
             </section>
 
+            <section class="step">
+                <h3>Dither</h3>
+                <canvas id="dither" width="300" height="300"></canvas>
+            </section>
+
 
         </div>
-
 
         <script type="text/javascript" src="jsfeat-min.js"></script>
         <script type="text/javascript" src="bbf_face.js"></script>

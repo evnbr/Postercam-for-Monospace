@@ -1,11 +1,12 @@
 var app_options = {
     has_webcam: false,
     printing_enabled: false,
-    face_step_fwd: 2,
-    face_step_bwd: 0.2,
+    face_confidence_step: 3,
+    face_confidence_decay: 0.3,
     now_playing: false, 
-    draw_triangles: false,
-    contrast_boost: 60
+    contrast_boost: 100,
+    dither_expiry: 20, // frames
+    delay: 20 // seconds
 };
 
 
@@ -26,6 +27,7 @@ var app_options = {
         // -----
         if (!app_options.has_webcam) {
             app_options.now_playing = true;
+            playpause.classList.add("playing");
             playpause.innerHTML = "Pause";
             get_webcam();
             return;
@@ -35,10 +37,12 @@ var app_options = {
         // ----
         if (app_options.now_playing) {
             app_options.now_playing = false;
+            playpause.classList.remove("playing");
             playpause.innerHTML = "Start";
         }
         else {
             app_options.now_playing = true;
+            playpause.classList.add("playing");
             playpause.innerHTML = "Pause";
             tick();
         }
@@ -51,21 +55,61 @@ var app_options = {
 })();
 
 
-var video = document.getElementById('webcam');
+// ----------------------
 
-var canvas = document.getElementById('canvas');
+// V I D E O  and  C A N V A S 
 
-var triangle_canvas = document.getElementById('facets');
 
-var face_canvas = document.getElementById('facetemp');
+var video = document.getElementById('webcam')
+  , canvas = document.getElementById('canvas')
+  , triangle_canvas = document.getElementById('facets')
+  , face_canvas = document.getElementById('facetemp')
+  , fullres_canvas = document.getElementById('fullres')
+  , dither_canvas = document.getElementById('dither')
+  , face_canvas_list = document.querySelectorAll('.justface')
+  , dither_canvas_list = document.querySelectorAll('.dither')
+  ;
 
-var fullres_canvas = document.getElementById('fullres');
 
-var dither_canvas = document.getElementById('dither');
+// ----------------------
 
-var log = document.getElementById('log');
+// C O N T E X T S
 
-var face_canvas_list = document.querySelectorAll('.justface');
+var gui
+    , options
+    , ctx
+    , triangle_ctx
+    , face_ctx
+    , fullres_ctx
+    ;
+
+// ------------------------
+
+// D A T A   S T R U C T U R E S
+
+
+var img_u8
+  , face_img_u8
+  , corners
+  , threshold;
+
+
+
+
+if (dither_canvas_list.length !== face_canvas_list.length) {
+    alert("Different number of dither canvases (" + dither_canvas_list.length + ") and face canvases (" + face_canvas_list.length + ") !");
+}
+
+var dithered_faces = [];
+for (var i = 0; i < face_canvas_list.length; i++) {
+    var dith = new DitheredFace(face_canvas_list[i], dither_canvas_list[i]);
+    dithered_faces.push(dith);
+}
+
+
+// ------------------------
+
+// G E T   W E B C A M
 
 
 function get_webcam() {
@@ -91,17 +135,17 @@ function get_webcam() {
 }
 
 
-
-
-
-var gui, options, ctx, triangle_ctx, face_ctx;
-var img_u8, face_img_u8, corners, threshold;
-
 var demo_opt = function(){
     this.threshold = 10;
     this.resolution = 0.4;
     this.draw_borders = false;
 }
+
+
+
+// ------------------------
+
+// S T A R T   A P P
 
 
 function start_app() {
@@ -131,13 +175,21 @@ function start_app() {
     ctx = canvas.getContext('2d');
     triangle_ctx = triangle_canvas.getContext('2d');
     face_ctx = face_canvas.getContext('2d');
+    fullres_ctx = fullres_canvas.getContext('2d');
 
     setResolution(options.resolution);
 
     jsfeat.fast_corners.set_threshold(options.threshold);
     jsfeat.bbf.prepare_cascade(jsfeat.bbf.face_cascade);
 }
-            
+
+
+
+// ------------------------
+
+// L O O P
+
+
 function tick() {
     
     if (app_options.now_playing) compatibility.requestAnimationFrame(tick);
@@ -153,6 +205,8 @@ function tick() {
         // ----------
 
         ctx.drawImage(video, 0, 0, cwidth, cheight);
+        fullres_ctx.drawImage(video, 0, 0, 640, 480);
+
         var imageData = ctx.getImageData(0, 0, cwidth, cheight);
 
 
@@ -171,20 +225,11 @@ function tick() {
     
 
 
-        // DITHERIZE
-        // ---------
-        // ditherize(canvas);
-        // ditherize(face_canvas);
-        ditherize(face_canvas_list[0]);
-        // ditherize(triangle_canvas);
-
         // DETECT FACES
         // ------------
         var pyr = jsfeat.bbf.build_pyramid(img_u8, 24*2, 24*2, 4);
         var rects = jsfeat.bbf.detect(pyr, jsfeat.bbf.face_cascade);
         rects = jsfeat.bbf.group_rectangles(rects, 1);
-
-
 
 
         // DETECT CORNERS
@@ -196,28 +241,30 @@ function tick() {
         var count = jsfeat.fast_corners.detect(img_u8, corners, 5);
 
 
-        var face_w = draw_faces(ctx, rects, cwidth/img_u8.cols, 4, canvas.width); // count up to 4 faces
-        face_detected_update(face_w);
+        var are_faces = draw_faces(ctx, rects, cwidth/img_u8.cols, 4, canvas.width); // count up to 4 faces
+        face_detected_update(are_faces);
+
+
+        // DITHERIZE
+        // ---------
+        // ditherize(canvas);
+        // ditherize(face_canvas);
+        // ditherize(face_canvas_list[0]);
+        // ditherize(triangle_canvas);
+
+        for (var i = 0; i < dithered_faces.length; i++) {
+            dithered_faces[i].tick();
+        }
+
     }
 }
 
 
 
 
+// ------------------------
 
-
-
-// D3 
-// -------
-
-var sc = 4;
-var width = 1200,
-    height = 800;
-
-
-
-
-
+// F A C E  D E T E C T I O N
 
 
 // Facial progress bar
@@ -225,22 +272,19 @@ var width = 1200,
 var progress = document.getElementById("faceprogress");
 var facesizeprogress = document.getElementById("facesizeprogress");
 var datetime = document.getElementById('datetime');
-var title = document.getElementById('title');
-var face_log = document.getElementById("facesizelog");
 var progress_value = 0;
 var progress_max = 100;
 var printer_paused = false;
-function face_detected_update(face_w) {
+function face_detected_update(are_faces) {
 
-    // var there_is_a_face = (face_w > 0.05 && !printer_paused);
 
-    if (face_w > 0.05) {
+    if (!printer_paused) {
 
-        if (!printer_paused) {
-            progress_value += app_options.face_step_fwd;
+        if (are_faces) {
+            progress_value += app_options.face_confidence_step;
         }
         else {
-            progress_value -= app_options.face_step_bwd;
+            progress_value -= app_options.face_confidence_decay;
         }
     }
 
@@ -253,7 +297,7 @@ function face_detected_update(face_w) {
         progress_value = 0;
 
 
-        datetime.innerHTML = moment().format('h:mm:ss A — D MMMM YYYY');
+        datetime.innerHTML = moment().format('h:mm:ss A — D MMM YYYY');
 
         // Print, if appropriate
         // ---------------------
@@ -268,16 +312,19 @@ function face_detected_update(face_w) {
         setTimeout(function(){
             printer_paused = false;
             faceprogress.className = "";
-        }, 45 * 1000); // 45 second throttler
+        }, app_options.delay * 1000); // 45 second throttler
 
     } 
     progress.setAttribute("value", progress_value);
-    facesizeprogress.setAttribute("value", face_w);
+    // facesizeprogress.setAttribute("value", face_w);
 }
 face_detected_update(false);
 
 
 
+// ------------------------
+
+// F A C E  D R A W I N G
 
 function draw_faces(ctx, rects, sc, max, cwid) {
     var on = rects.length;
@@ -286,10 +333,22 @@ function draw_faces(ctx, rects, sc, max, cwid) {
     }
     var n = max || on;
     n = Math.min(n, on);
-    var r;
+
+
+    var r
+        , rw
+        , rh
+        , inset
+        , face_data
+        ;
     // console.log(n);
 
     face_ctx.clearRect(0,0,face_canvas.width, face_canvas.height);
+
+    for(var i = 0; i < face_canvas_list.length; ++i) {
+        // face_canvas_list[i].getContext('2d').clearRect(0,0,300,300);
+    }
+
 
     for(var i = 0; i < n; ++i) {
         r = rects[i];
@@ -300,20 +359,40 @@ function draw_faces(ctx, rects, sc, max, cwid) {
             (r.height*sc)|0
         );
 
-        var inset = - r.width / 6;
+        inset = - r.width / 4;
 
-        var faceData = canvas.getContext('2d').getImageData(r.x + inset, r.y + inset, r.width - inset*2, r.height - inset*2);
+        rw = (r.width  - inset*2) / options.resolution;
+        rh = (r.height - inset*2) / options.resolution;
 
-        face_ctx.putImageData(contrastImage(faceData, app_options.contrast_boost), 0, 0);
+        face_data = fullres_ctx.getImageData(
+            (r.x      + inset  ) / options.resolution,
+            (r.y      + inset  ) / options.resolution,
+            rw,
+            rh
+        );
 
-        face_canvas_list[i].getContext('2d').drawImage(face_canvas,0,0, (300/(r.width - inset*2)) * 300, (300/(r.height - inset*2)) * 300);
+
+
+        face_ctx.putImageData(contrastImage(face_data, app_options.contrast_boost), 0, 0);
+
+        face_canvas_list[i].getContext('2d').drawImage(
+            face_canvas,
+            0,
+            0,
+            (300/rw) * 300,
+            (300/rh) * 300
+        );
+
+        dithered_faces[i].update();
     }
 
-    if (rects.length) return range_to_one(rects[0].width, [22,60]);
-
-    // update_d3_face([]);
-
+    if (rects.length) return true; // range_to_one(rects[0].width, [22,60]);
+    else return false;
 }
+
+// ------------------------
+
+// B O O S T  C O N T R A S T
 
 function contrastImage(imageData, contrast) {
 
@@ -331,49 +410,86 @@ function contrastImage(imageData, contrast) {
 
 
 
-var dither_worker = new Worker("dither.js");
-var dither_worker_busy = false;
 
-dither_worker.addEventListener('message', function (e) {
-    dither_canvas.getContext('2d').putImageData(e.data, 0, 0);
-    dither_worker_busy = false;
-}, false);
+// ------------------------
 
-function ditherize(input_canvas) {
-  if (input_canvas && dither_worker && !dither_worker_busy) {
-    var imageData = input_canvas.getContext('2d').getImageData(0,0, input_canvas.width, input_canvas.height);        
-    dither_worker.postMessage({
-      imageData: imageData,
-      threshold: 0.2,
-      type: "atkinson"
-    });
-    // Don't process a new frame until this one is done
-    dither_worker_busy = true;
-  }
+// D I T H E R
+
+// var dither_worker = new Worker("dither.js");
+// var dither_worker_busy = false;
+
+// dither_worker.addEventListener('message', function (e) {
+//     dither_canvas.getContext('2d').putImageData(e.data, 0, 0);
+//     dither_worker_busy = false;
+// }, false);
+
+// function ditherize(input_canvas) {
+//   if (input_canvas && dither_worker && !dither_worker_busy) {
+//     var imageData = input_canvas.getContext('2d').getImageData(0,0, input_canvas.width, input_canvas.height);        
+//     dither_worker.postMessage({
+//       imageData: imageData,
+//       threshold: 0.2,
+//       type: "atkinson"
+//     });
+//     // Don't process a new frame until this one is done
+//     dither_worker_busy = true;
+//   }
+// }
+
+function DitheredFace(input, output) {
+    var self = this
+      , afterimage_max = app_options.dither_expiry
+      , last_drawn = afterimage_max
+      , in_canvas = input
+      , out_canvas = output
+      , in_ctx = in_canvas.getContext('2d')
+      , out_ctx = out_canvas.getContext('2d')
+      , worker = new Worker("dither.js")
+      , worker_busy = false
+      ;
+
+    self.init = function() {
+        out_canvas.style.display = "none";
+    }
+
+    self.update = function() {
+        if (!worker_busy) {
+            var imageData = in_ctx.getImageData(0,0, in_canvas.width, in_canvas.height);        
+            worker.postMessage({
+              imageData: imageData,
+              threshold: 0.2,
+              type: "atkinson"
+            });
+            worker_busy = true;
+        }
+    }
+
+    self.tick = function() {
+        if (last_drawn < afterimage_max) {
+            last_drawn++;
+        }
+        else {
+            out_canvas.style.display = "none";
+        }
+    }
+
+    worker.addEventListener('message', function (e) {
+        out_ctx.putImageData(e.data, 0, 0);
+        worker_busy = false;
+        out_canvas.style.display = "block";
+        last_drawn = 0;
+    }, false);
+
+    self.init();
 }
 
 
 
-// Make Child Window
-// -----------------
 
 
-function make_child_window() {
-    var url = "http://localhost:8000/child.html";
-    var width = 1200;
-    var height = 800;
-    var left = parseInt((screen.availWidth/2) - (width/2));
-    var top = parseInt((screen.availHeight/2) - (height/2));
-    var windowFeatures = "width=" + width + ",height=" + height +   
-        ",status,resizable,left=" + left + ",top=" + top + 
-        "screenX=" + left + ",screenY=" + top + ",scrollbars=yes";
+// ------------------------
 
-    return window.open(url, "subWind", windowFeatures, "POS");
-}
-
-
-
-
+// U T I L I T I E S
 
 
 // 0-1 to Range and Range to 0-1

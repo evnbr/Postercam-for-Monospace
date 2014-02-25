@@ -1,150 +1,163 @@
 *
-    padding: 0
-    margin: 0
-    font: inherit
-
-input[type=checkbox]
-    margin-right: 10px
+  padding: 0
+  margin: 0
+  font: inherit
+  -webkit-box-sizing: border-box
+  box-sizing: border-box
 
 html
-    font: 15px/1.5 sans-serif
+  font: 15px/1.5 sans-serif
+
+*:focus
+  outline: none
 
 body
-    position: relative
-    margin-top: 3em
+  position: relative
+  margin-top: 3em
+  margin-bottom: 3em
+  background: #aaa
 
 canvas
-    display: block
+  display: block
 
 .justface
-    display: inline-block
+  display: inline-block
 
 .step
-    display: inline-block
-    vertical-align: top
+  display: inline-block
+  vertical-align: top
 
 #wrapper 
-    margin: 10px auto
-    position: relative
+  position: relative
+  video, canvas
+    max-width: 300px
+    max-height: 300px
 
-#facets 
-    //position: absolute
-    //top: 0px
-    //left: 0px
-    // visibility: hidden
-
-// video, #facetemp
-    visibility: hidden
-
-
-svg 
-    position: absolute
-    top: 0px
-    left: 0px
-    -webkit-transform: scale(1.5)
-    -webkit-transform-origin: top left
 
 #controls
-    padding: 0.5em
-    background: #eee
-    position: fixed
-    top: 0
-    left: 0
-    right: 0
-    z-index: 999
-    -webkit-user-select: none
+  background: #eee
+  position: fixed
+  bottom: 0
+  left: 0
+  right: 0
+  z-index: 999
+  -webkit-user-select: none
+
+button
+  background: blue
+  color: white
+  cursor: pointer
+  &:hover
+    opacity: 0.8
+  border: 0
+  width: 100px
+  padding: 5px
+  &.playing
+    background: #bbb
+    color: blue
 
 
 .col
-    display: inline-block
-    border-right: 1px dotted gray
-    padding-right: 10px
-    margin-right: 10px
-    vertical-align: top
-    &:last-child
-        border-right: 0
+  display: inline-block
+  border-right: 1px solid white
+  padding-right: 10px
+  margin-right: 10px
+  vertical-align: middle
+  &:last-child
+    border-right: 0
 
 label
-    display: block
-    line-height: 20px
+  display: block
+  line-height: 20px
 
 progress[value], input[type="range"]
-    -webkit-appearance: none !important
-    margin-right: 20px
-    height: 10px
-    width: 300px
-    background: #ddd
-    &:focus
-        outline: none
+  -webkit-appearance: none !important
+  margin-right: 20px
+  height: 10px
+  width: 300px
+  background: #ddd
+  &:focus
+    outline: none
 
 @-webkit-keyframes countdown
-    0%
-        background: gray
-        width: 300px
-    100%
-        background: gray
-        width: 0px
+  0%
+    background: gray
+    width: 300px
+  100%
+    background: gray
+    width: 0px
 
 
 progress[value]
-    height: 10px
-    &::-webkit-progress-bar
-        background: #ddd
-    &::-webkit-progress-value
-        background: blue
-    &.paused::-webkit-progress-bar
-        -webkit-animation: countdown 40s 1
+  height: 10px
+  &::-webkit-progress-bar
+    background: #ddd
+  &::-webkit-progress-value
+    background: blue
+  &.paused::-webkit-progress-bar
+    -webkit-animation: countdown 20s 1
 
 #facesizeprogress
-    &::-webkit-progress-value
-        background: #999
+  &::-webkit-progress-value
+    background: #999
 
 
 input[type="range"]
-    &::-webkit-slider-thumb
-        -webkit-appearance: none
-        height: 20px
-        width: 20px
-        background: white
-        border-radius: 50%
-        box-shadow: 0 1px 2px rgba(0,0,0,0.2)
+  &::-webkit-slider-thumb
+    -webkit-appearance: none
+    height: 20px
+    width: 20px
+    background: white
+    border-radius: 50%
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2)
+
+
+h1
+  font: 500 25px/1.1 Brown
+  margin-top: 1em
+  margin-bottom: 0.3em
+  padding: 0 15px
 
 .labeltext
-    display: none
-    font-size: 18px
-    font-family: "Apercu Mono", monospace
-    position: absolute
+  font: 10px/1.2 Akkurat-Mono
+  padding: 0 15px 2em
+  // Force bigger bottom margin 
+  border-bottom: 1px dotted #f4f4f4
 
-#title
-    color: purple
+.logo
+  margin: 0 15px
+  img
+    width: 100%
 
-#datetime
-    color: magenta
+#printable
+  margin: auto
+  width: 100%
+  max-width: 240px
+  background: white
+  canvas
+    max-width: 100%
 
-#playpause
-    padding: 5px 50px
+
+.logo
+  display: none
+
+.dither.visible + .logo
+  display: block
 
 // Print Styles
 // ------------
 
 @media print 
-    
-    #controls
-        display: none
+  body
+    background: transparent
 
-// SVG Styles
-// ----------
+  #controls, #wrapper
+    display: none
 
-path 
-    fill: yellow
-    stroke: #000
+  #printable
+    padding: 0in
 
-line 
-    pointer-events: none
-    stroke: magenta
-    stroke-width: 0.2px
 
-rect
-    fill: rgba(255,0,255,0.00)
-    stroke: purple
-    stroke-width: 0px
+
+
+
