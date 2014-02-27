@@ -6,7 +6,7 @@
   box-sizing: border-box
 
 html
-  font: 15px/1.5 sans-serif
+  font: 15px/1.5 Verdana, sans-serif
 
 *:focus
   outline: none
@@ -15,7 +15,7 @@ body
   position: relative
   margin-top: 3em
   margin-bottom: 3em
-  background: #aaa
+  background: #eee
 
 canvas
   display: block
@@ -29,40 +29,53 @@ canvas
 
 #wrapper 
   position: relative
+  display: none
+  .debug &
+    display: block
   video, canvas
     max-width: 300px
     max-height: 300px
 
 
 #controls
-  background: #eee
+  color: blue
+  padding: 15px
   position: fixed
+  top: 0
   bottom: 0
-  left: 0
   right: 0
   z-index: 999
+  width: 250px
   -webkit-user-select: none
+  opacity: 0.6
+  .debug &
+    opacity: 1
 
 button
-  background: blue
-  color: white
   cursor: pointer
-  &:hover
-    opacity: 0.8
   border: 0
-  width: 100px
-  padding: 5px
-  &.playing
-    background: #bbb
-    color: blue
+  background: #ddd
+  display: block
+  width: 100%
+  // width: 100px
+  padding: 10px
 
+#playpause
+  background: transparent
+  color: blue
+  border: 1px solid blue
+  border-radius: 3px
+  &:hover
+    color: white
+    background: blue
 
 .col
-  display: inline-block
-  border-right: 1px solid white
-  padding-right: 10px
-  margin-right: 10px
-  vertical-align: middle
+  // display: inline-block
+  // border-right: 1px solid white
+  // padding-right: 10px
+  // margin-right: 10px
+  // vertical-align: middle
+  margin-bottom: 2em
   &:last-child
     border-right: 0
 
@@ -72,30 +85,38 @@ label
 
 progress[value], input[type="range"]
   -webkit-appearance: none !important
-  margin-right: 20px
-  height: 10px
-  width: 300px
-  background: #ddd
+  margin-right: 10px
+  height: 2px
+  width: 150px
+  background: blue
   &:focus
     outline: none
 
 @-webkit-keyframes countdown
   0%
-    background: gray
-    width: 300px
+    background: brown
+    width: 100%
   100%
-    background: gray
-    width: 0px
+    background: brown
+    width: 0%
 
+h2
+  margin-bottom: 0.5em
 
 progress[value]
-  height: 10px
+  background: transparent
+  border: 1px solid blue
+  border-radius: 3px
+  height: 20px
+  width: 100%
   &::-webkit-progress-bar
-    background: #ddd
+    background: transparent
+    border-radius: 3px
   &::-webkit-progress-value
     background: blue
+    border-radius: 3px
   &.paused::-webkit-progress-bar
-    -webkit-animation: countdown 20s 1
+    -webkit-animation: countdown 10s 1
 
 #facesizeprogress
   &::-webkit-progress-value
@@ -108,59 +129,85 @@ input[type="range"]
     height: 20px
     width: 20px
     background: white
+    border: 1px solid blue
     border-radius: 50%
-    box-shadow: 0 1px 2px rgba(0,0,0,0.2)
+    // box-shadow: 0 1px 2px rgba(0,0,0,0.2)
 
 
 h1
-  font: 500 25px/1.1 Brown
+  font: 400 25px/1.2 Brown
   margin-top: 1.5em
   margin-bottom: 0.3em
   padding: 0 15px
+
+.top
+  margin-top: 0
+  padding-top: 0.8em
+
 
 .labeltext
   font: 12px/1.5 Akkurat-Mono
   padding: 0 15px 2em
   // Force bigger bottom margin 
-  border-bottom: 1px dotted #f4f4f4
+  border-bottom: 1px dotted black
 
-.logo
+.logo, .logo-white
   margin: 0 15px
   height: 0
+  display: none
+  z-index: 999
   position: relative
   img
+    display: block
     position: relative
     top: -20px
     width: 100%
+  &.logo-first
+    margin-top: 2.5em
+    display: block
+  &.logo-last
+    margin-bottom: 1em
+    display: block
 
 #printable
   margin: auto
   width: 100%
   max-width: 240px
+  // background: black
   background: white
+  // color: white
   canvas
     max-width: 100%
 
 
-.logo
-  display: none
-
 .dither
   display: none
+  margin-bottom: 5px
   &.visible
     display: block
-    &+ .logo
-      display: block
+
+[data-rotate = '9']
+  -webkit-transform: rotate(0deg)
+[data-rotate = '1']
+  -webkit-transform: rotate(90deg)
+[data-rotate = '2']
+  -webkit-transform: rotate(180deg)
+[data-rotate = '3']
+  -webkit-transform: rotate(270deg)
+
+.visible ~ .visible + .logo
+  display: block
 
 // Print Styles
 // ------------
 
 @media print 
   body
+    margin: 0
     background: transparent
 
   #controls, #wrapper
-    display: none
+    display: none !important
 
   #printable
     padding: 0in

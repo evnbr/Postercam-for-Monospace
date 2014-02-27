@@ -6,7 +6,7 @@
   box-sizing: border-box; }
 
 html {
-  font: 15px/1.5 sans-serif; }
+  font: 15px/1.5 Verdana, sans-serif; }
 
 *:focus {
   outline: none; }
@@ -15,7 +15,7 @@ body {
   position: relative;
   margin-top: 3em;
   margin-bottom: 3em;
-  background: #aaaaaa; }
+  background: #eeeeee; }
 
 canvas {
   display: block; }
@@ -28,39 +28,47 @@ canvas {
   vertical-align: top; }
 
 #wrapper {
-  position: relative; }
+  position: relative;
+  display: none; }
+  .debug #wrapper {
+    display: block; }
   #wrapper video, #wrapper canvas {
     max-width: 300px;
     max-height: 300px; }
 
 #controls {
-  background: #eeeeee;
+  color: blue;
+  padding: 15px;
   position: fixed;
+  top: 0;
   bottom: 0;
-  left: 0;
   right: 0;
   z-index: 999;
-  -webkit-user-select: none; }
+  width: 250px;
+  -webkit-user-select: none;
+  opacity: 0.6; }
+  .debug #controls {
+    opacity: 1; }
 
 button {
-  background: blue;
-  color: white;
   cursor: pointer;
   border: 0;
-  width: 100px;
-  padding: 5px; }
-  button:hover {
-    opacity: 0.8; }
-  button.playing {
-    background: #bbbbbb;
-    color: blue; }
+  background: #dddddd;
+  display: block;
+  width: 100%;
+  padding: 10px; }
+
+#playpause {
+  background: transparent;
+  color: blue;
+  border: 1px solid blue;
+  border-radius: 3px; }
+  #playpause:hover {
+    color: white;
+    background: blue; }
 
 .col {
-  display: inline-block;
-  border-right: 1px solid white;
-  padding-right: 10px;
-  margin-right: 10px;
-  vertical-align: middle; }
+  margin-bottom: 2em; }
   .col:last-child {
     border-right: 0; }
 
@@ -70,30 +78,39 @@ label {
 
 progress[value], input[type="range"] {
   -webkit-appearance: none !important;
-  margin-right: 20px;
-  height: 10px;
-  width: 300px;
-  background: #dddddd; }
+  margin-right: 10px;
+  height: 2px;
+  width: 150px;
+  background: blue; }
   progress[value]:focus, input[type="range"]:focus {
     outline: none; }
 
 @-webkit-keyframes countdown {
   0% {
-    background: gray;
-    width: 300px; }
+    background: brown;
+    width: 100%; }
 
   100% {
-    background: gray;
-    width: 0px; } }
+    background: brown;
+    width: 0%; } }
+
+h2 {
+  margin-bottom: 0.5em; }
 
 progress[value] {
-  height: 10px; }
+  background: transparent;
+  border: 1px solid blue;
+  border-radius: 3px;
+  height: 20px;
+  width: 100%; }
   progress[value]::-webkit-progress-bar {
-    background: #dddddd; }
+    background: transparent;
+    border-radius: 3px; }
   progress[value]::-webkit-progress-value {
-    background: blue; }
+    background: blue;
+    border-radius: 3px; }
   progress[value].paused::-webkit-progress-bar {
-    -webkit-animation: countdown 20s 1; }
+    -webkit-animation: countdown 10s 1; }
 
 #facesizeprogress::-webkit-progress-value {
   background: #999999; }
@@ -103,28 +120,41 @@ input[type="range"]::-webkit-slider-thumb {
   height: 20px;
   width: 20px;
   background: white;
-  border-radius: 50%;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); }
+  border: 1px solid blue;
+  border-radius: 50%; }
 
 h1 {
-  font: 500 25px/1.1 brown;
+  font: 400 25px/1.2 brown;
   margin-top: 1.5em;
   margin-bottom: 0.3em;
   padding: 0 15px; }
 
+.top {
+  margin-top: 0;
+  padding-top: 0.8em; }
+
 .labeltext {
   font: 12px/1.5 Akkurat-Mono;
   padding: 0 15px 2em;
-  border-bottom: 1px dotted #f4f4f4; }
+  border-bottom: 1px dotted black; }
 
-.logo {
+.logo, .logo-white {
   margin: 0 15px;
   height: 0;
+  display: none;
+  z-index: 999;
   position: relative; }
-  .logo img {
+  .logo img, .logo-white img {
+    display: block;
     position: relative;
     top: -20px;
     width: 100%; }
+  .logo.logo-first, .logo-white.logo-first {
+    margin-top: 2.5em;
+    display: block; }
+  .logo.logo-last, .logo-white.logo-last {
+    margin-bottom: 1em;
+    display: block; }
 
 #printable {
   margin: auto;
@@ -134,22 +164,34 @@ h1 {
   #printable canvas {
     max-width: 100%; }
 
-.logo {
-  display: none; }
-
 .dither {
-  display: none; }
+  display: none;
+  margin-bottom: 5px; }
   .dither.visible {
     display: block; }
-    .dither.visible + .logo {
-      display: block; }
+
+[data-rotate='9'] {
+  -webkit-transform: rotate(0deg); }
+
+[data-rotate='1'] {
+  -webkit-transform: rotate(90deg); }
+
+[data-rotate='2'] {
+  -webkit-transform: rotate(180deg); }
+
+[data-rotate='3'] {
+  -webkit-transform: rotate(270deg); }
+
+.visible ~ .visible + .logo {
+  display: block; }
 
 @media print {
   body {
+    margin: 0;
     background: transparent; }
 
   #controls, #wrapper {
-    display: none; }
+    display: none !important; }
 
   #printable {
     padding: 0in; } }

@@ -18,47 +18,77 @@
 
         <div id="controls">
             <div class="col">
-                <button id="playpause">Start</button>
+                <button id="playpause">
+                    Start
+                </button>
             </div>
-            <div class="col">
-                <label><input id="enableprint" type="checkbox" unchecked />Real printing</label>
-            </div>
-            <div class="col">
+            <div class="col" style="display: none">
                 <label>
                     <progress id="facesizeprogress" max="1" value="0"></progress>
                     Face Size
                 </label>
             </div>
             <div class="col">
+                <h2>Progress</h2>
                 <label>
                     <progress id="faceprogress" max="100" value="50"></progress>
-                    Face progress
+                </label>
+            </div>
+            <div class="col">
+                <h2>Boost contrast</h2>
+                <label>
+                    <input type="range" id="contrast" max="130" value="50" />
+                    <span id="contrastnumber">+50</span>
+                </label>
+            </div>
+            <div class="col">
+                <h2>Delay next print</h2>
+                <label>
+                    <input type="range" id="delay" max="20" value="10" />
+                    <span id="delaynumber">10s</span>
+                </label>
+            </div>
+            <div class="col">
+                <h2>After-image timeout</h2>
+                <label>
+                    <input type="range" id="afterimage" max="300" value="40" />
+                    <span id="afterimagenumber">40f</span>
+                </label>
+            </div>
+            <div class="col">
+                <label>
+                    <input id="showcanvas" type="checkbox" unchecked />
+                    Debug
+                </label>
+            </div>
+            <div class="col">
+                <label>
+                    <input id="enableprint" type="checkbox" unchecked />
+                    Auto-print
                 </label>
             </div>
         </div>
 
         <div id="printable">
-            <h1 class="title">
+            <h1 class="title top">
                 thanks for stopping by
             </h1>
 
-            <canvas class="dither" width="300" height="300"></canvas>
-            <div class="logo"><img src="logo.svg" /></div>
+            <div class="logo logo-first"><img src="logo.svg" /></div>
 
             <canvas class="dither" width="300" height="300"></canvas>
-            <div class="logo"><img src="logo.svg" /></div>
 
             <canvas class="dither" width="300" height="300"></canvas>
-            <div class="logo"><img src="logo.svg" /></div>
 
             <canvas class="dither" width="300" height="300"></canvas>
-            <div class="logo"><img src="logo.svg" /></div>
 
             <canvas class="dither" width="300" height="300"></canvas>
-            <div class="logo"><img src="logo.svg" /></div>
 
             <canvas class="dither" width="300" height="300"></canvas>
-            <div class="logo"><img src="logo.svg" /></div>
+
+            <canvas class="dither" width="300" height="300"></canvas>
+
+            <div class="logo logo-last"><img src="logo.svg" /></div>
 
             <h1 class="title">
                 a senior show from your friends in graphic design

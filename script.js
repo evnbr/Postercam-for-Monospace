@@ -1,12 +1,12 @@
 var app_options = {
     has_webcam: false,
     printing_enabled: false,
-    face_confidence_step: 2,
-    face_confidence_decay: 0.3,
+    face_confidence_step: 4,
+    face_confidence_decay: 0.2,
     now_playing: false, 
-    contrast_boost: 100,
-    dither_expiry: 20, // frames
-    delay: 20 // seconds
+    contrast_boost: 40,
+    dither_expiry: 40, // frames
+    delay: 10 // seconds
 };
 
 
@@ -49,7 +49,42 @@ var app_options = {
 
     }, false);
 
+    var showcanvas = document.getElementById("showcanvas");
+    showcanvas.addEventListener("click", function(e){
+        if (!this.checked) {
+            document.body.classList.remove("debug");
+        }
+        else {
+            document.body.classList.add("debug");
+        }
+    });
 
+    var delayslider = document.getElementById("delay");
+    var delaynumber = document.getElementById("delaynumber");
+    delayslider.addEventListener("change", function(slider){
+        app_options.delay = parseFloat(this.value);
+        delaynumber.innerHTML = this.value + "s";
+    }, false);
+
+
+    var contrastslider = document.getElementById("contrast");
+    var contrastnumber = document.getElementById("contrastnumber");
+    contrastslider.addEventListener("change", function(slider){
+        app_options.contrast_boost = parseFloat(this.value);
+        contrastnumber.innerHTML = "+" + this.value;
+    }, false);
+
+    var afterimageslider = document.getElementById("afterimage");
+    var afterimagenumber = document.getElementById("afterimagenumber");
+    afterimageslider.addEventListener("change", function(slider){
+        app_options.dither_expiry = parseFloat(this.value);
+        afterimagenumber.innerHTML = this.value + "f";
+    }, false);
+
+
+    app_options.delay = parseFloat(delayslider.value);
+    app_options.dither_expiry = parseFloat(afterimageslider.value);
+    app_options.contrast_boost = parseFloat(contrastslider.value);
     app_options.printing_enabled = printingcheckbox.checked;
 
 })();
@@ -457,6 +492,7 @@ function DitheredFace(input, output) {
         out_ctx.putImageData(e.data, 0, 0);
         worker_busy = false;
         out_canvas.classList.add("visible");
+        // out_canvas.setAttribute("data-rotate", parseInt(Math.random()*4));
         last_drawn = 0;
     }, false);
 
